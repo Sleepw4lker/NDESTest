@@ -52,7 +52,7 @@ namespace NDESTest
             oCertRequestPkcs10.Initialize(CERTENROLLLib.X509CertificateEnrollmentContext.ContextUser);
 
             var oSubjectDN = new CX500DistinguishedName();
-            oSubjectDN.Encode("CN=TestNDESCert");
+            oSubjectDN.Encode(textBox3.Text);
 
             oCertRequestPkcs10.Subject = oSubjectDN;
             oCertRequestPkcs10.PrivateKey.Length = 2048;
