@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using CERTENROLLLib;
-using CERTCLILib;
+using System.Security.Cryptography.X509Certificates;
 using System.IO;
 
 namespace NDESTest
@@ -22,21 +22,8 @@ namespace NDESTest
 
         private void button1_Click(object sender, EventArgs e)
         {
-            const int CR_IN_BASE64HEADER = 0;
-            const int CR_IN_BASE64 = 1;
-            const int CR_IN_PKCS7 = 0x300;
-            const int CR_IN_SCEP = 0x00010000;
-            const int CR_IN_SCEPPOST = 0x02000000; // Pass CR_IN_SCEP for the first argument, and optionally bit-wise OR in CR_IN_SCEPPOST if your server supports POST
-
-            //const int CR_DISP_INCOMPLETE = 0; // Request did not complete
-            //const int CR_DISP_ERROR = 1; // Request failed
-            const int CR_DISP_DENIED = 2; // Request denied
-            const int CR_DISP_ISSUED = 3; // Certificate issued
-            //const int CR_DISP_ISSUED_OUT_OF_BAND = 4; // Certificate issued separately
-            //const int CR_DISP_UNDER_SUBMISSION = 5; // Request taken under submission
-
             const int SCEPProcessDefault = 0x0;
-            const int SCEPProcessSkipCertInstall = 0x1;
+            //const int SCEPProcessSkipCertInstall = 0x1;
 
             string protocol;
 
@@ -91,7 +78,12 @@ namespace NDESTest
                     break;
 
                 case CERTENROLLLib.X509SCEPDisposition.SCEPDispositionSuccess:
-                    MessageBox.Show("Issued");
+                    
+                    string base64 = oEnrollmentHelper.X509SCEPEnrollment.Certificate[EncodingType.XCN_CRYPT_STRING_BASE64];
+                    X509Certificate2 cert = new X509Certificate2();
+                    cert.Import(Convert.FromBase64String(base64));
+                    X509Certificate2UI.DisplayCertificate(cert);
+                    
                     break;
                 default:
                     MessageBox.Show("Unknown");
