@@ -80,8 +80,3 @@ Function Test-NDESEnrollment {
     }
 
 }
-
-Test-NDESEnrollment `
-    -ComputerName "192.168.1.136" `
-    -CommonName "TestNDESCert" `
-    -ChallengePassword "FC7CD8910034EC90"
