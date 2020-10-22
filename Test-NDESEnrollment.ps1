@@ -16,13 +16,20 @@ Function Test-NDESEnrollment {
 
         [Parameter(Mandatory=$False)]
         [Switch]
-        $UseSSL = $False
+        $UseSSL = $False,
+
+        [Parameter(Mandatory=$False)]
+        [ValidateSet(1024,2048,3072,4096)]
+        [Int]
+        $KeyLength = 2048,
+
+        [Parameter(Mandatory=$False)]
+        [Switch]
+        $MachineContext = $False
     )
 
     begin {
-        $ContextUser = 1
-
-        $SCEPProcessDefault         = 0x0
+        $SCEPProcessDefault = 0x0
         #$SCEPProcessSkipCertInstall = 0x1
     
         $XCN_CRYPT_STRING_BASE64HEADER = 0x0
@@ -33,15 +40,15 @@ Function Test-NDESEnrollment {
 
     process {
 
-        If ($UseSSL) {
-            $ConfigString = "https://$($ComputerName)/certsrv/mscep/mscep.dll/pkiclient.exe"
-        }
-        Else {
-            $ConfigString = "http://$($ComputerName)/certsrv/mscep/mscep.dll/pkiclient.exe"
-        }
+        If ($UseSSL) 
+            { $Protocol = "https" }
+        Else 
+            { $Protocol = "http" }
+
+        $ConfigString = "$($Protocol)://$($ComputerName)/certsrv/mscep/mscep.dll/pkiclient.exe"
     
         $Pkcs10 = New-Object -ComObject "X509Enrollment.CX509CertificateRequestPkcs10"
-        $Pkcs10.Initialize($ContextUser)
+        $Pkcs10.Initialize([Int]($MachineContext -eq $True))
 
         $Subject = New-Object -ComObject "X509Enrollment.CX500DistinguishedName"
         $Subject.Encode("CN=$CommonName")
@@ -53,7 +60,7 @@ Function Test-NDESEnrollment {
             $Pkcs10.ChallengePassword = $ChallengePassword
         }
     
-        $Pkcs10.PrivateKey.Length = 2048
+        $Pkcs10.PrivateKey.Length = $KeyLength
 
         $Helper = New-Object -ComObject "X509Enrollment.CX509SCEPEnrollmentHelper"
 
